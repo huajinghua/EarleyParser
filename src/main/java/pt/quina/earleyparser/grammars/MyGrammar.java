@@ -1,7 +1,6 @@
-package earleyparser.grammars;
+package pt.quina.earleyparser.grammars;
 
-import earleyparser.components.RHS;
-import earleyparser.grammars.Grammar;
+import pt.quina.earleyparser.components.RHS;
 
 public class MyGrammar extends Grammar {
     public MyGrammar() {

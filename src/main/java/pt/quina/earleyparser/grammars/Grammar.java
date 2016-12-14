@@ -1,4 +1,4 @@
-package earleyparser.grammars; /******************************************************************************
+package pt.quina.earleyparser.grammars; /******************************************************************************
  * author: Breanna Ammons
  * project: EarleyParser with parse trees
  *
@@ -8,7 +8,7 @@ package earleyparser.grammars; /************************************************
  *
  *****************************************************************************/
 
-import earleyparser.components.RHS;
+import pt.quina.earleyparser.components.RHS;
 
 import java.util.HashMap;
 import java.util.Vector;

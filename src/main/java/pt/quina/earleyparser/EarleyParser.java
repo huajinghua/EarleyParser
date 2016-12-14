@@ -1,7 +1,9 @@
-import earleyparser.components.RHS;
-import earleyparser.components.Chart;
-import earleyparser.components.State;
-import earleyparser.grammars.Grammar;
+package pt.quina.earleyparser;
+
+import pt.quina.earleyparser.components.RHS;
+import pt.quina.earleyparser.components.Chart;
+import pt.quina.earleyparser.components.State;
+import pt.quina.earleyparser.grammars.Grammar;
 
 /******************************************************************************
  * author: Breanna Ammons

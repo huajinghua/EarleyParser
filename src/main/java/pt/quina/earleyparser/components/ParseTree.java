@@ -1,4 +1,4 @@
-package earleyparser.components; /******************************************************************************
+package pt.quina.earleyparser.components; /******************************************************************************
  * author: Breanna Ammons
  * project: EarleyParser with parse trees
  * 
@@ -15,7 +15,7 @@ package earleyparser.components; /**********************************************
  * 
  *****************************************************************************/
 
-import earleyparser.grammars.Grammar;
+import pt.quina.earleyparser.grammars.Grammar;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -116,9 +116,9 @@ public class ParseTree
 		{
 			for ( int a = 0; a < p.Children.size(); a++ )
 			{
-				if ( i >= ((PTNode) p.Children.get(a)).id )
+				if ( i >= p.Children.get(a).id )
 				{
-					p = (PTNode) p.Children.get(a);
+					p = p.Children.get(a);
 					break;
 				}
 			}
@@ -228,7 +228,7 @@ public class ParseTree
 
 			// Select the correct source (the one with the correct i)
 			if ( srcs.size() == 1 )
-				currentState = (State) srcs.get(0);
+				currentState = srcs.get(0);
 			else
 			{
 				State posState = tree.stateList.peekFirst();
@@ -238,7 +238,7 @@ public class ParseTree
 					// If the state we are currently looking at, matches the 
 					//  the top state in the stateList (with the dot moved 
 					//  one term) then it is the correct source.
-					currentState = (State) srcs.get(i);
+					currentState = srcs.get(i);
 					State moveCurrent = new State(currentState.getLHS(), 
 												  currentState.getRHS().moveDot(), 
 												  currentState.getI(), 
@@ -281,7 +281,7 @@ public class ParseTree
 			else
 				nextChild = childCopy;
 			
-			State nextState = (State) srcs.get(i);
+			State nextState = srcs.get(i);
 			String lhs = nextState.getLHS();
 
 			// When the sources list for a state was created during parsing, all of the 
@@ -333,7 +333,7 @@ public class ParseTree
 			for ( int i = 0; i < srcs.size(); i++ )
 			{
 				// Find all the trees that could come from this source.
-				State s = (State) srcs.get(i);
+				State s = srcs.get(i);
 				ParseTree pt = new ParseTree(parse.getLHS(), parse);
 				trees.addAll(parseTree(pt, pt, s));
 			}
@@ -343,7 +343,7 @@ public class ParseTree
 		Vector<ParseTree> noDups = new Vector<ParseTree>();
 		for ( int i = 0; i < trees.size(); i++ )
 		{
-			ParseTree pt = (ParseTree) trees.get(i);
+			ParseTree pt = trees.get(i);
 			if ( ! noDups.contains(pt) )
 				noDups.add(pt);
 		}
@@ -406,7 +406,7 @@ public class ParseTree
 
 		public PTNode getChild(int i)
 		{
-			return (PTNode) Children.get(i);
+			return Children.get(i);
 		}
 
 		/**********************************************************************
@@ -419,7 +419,7 @@ public class ParseTree
 			PTNode n = new PTNode(Value, null, id);
 			for ( int i = Children.size() - 1; i >= 0; i-- )
 			{
-				PTNode nc = ((PTNode) Children.get(i)).copy();
+				PTNode nc = Children.get(i).copy();
 				n.addChild(nc);
 				nc.Parent = n;
 			}
@@ -449,7 +449,7 @@ public class ParseTree
 
 			for ( int i = 0; i < Children.size(); i++ )
 			{
-				PTNode c = (PTNode) Children.get(i);
+				PTNode c = Children.get(i);
 				out.append(c.prettyPrint(offset + tab));
 			}
 
@@ -474,10 +474,10 @@ public class ParseTree
 			out.append(Value + "<");
 
 			for ( int i = 0; i < Children.size() - 1; i++ )
-				out.append((PTNode) Children.get(i) + ",");
+				out.append(Children.get(i) + ",");
 
 			if ( Children.size() > 0 )
-				out.append((PTNode) Children.get(Children.size() - 1));
+				out.append(Children.get(Children.size() - 1));
 
 			out.append(">");
 			return out.toString();
@@ -509,8 +509,8 @@ public class ParseTree
 
 			for ( int i = 0; i < this.Children.size(); i++ )
 			{
-				PTNode thisC = (PTNode) this.Children.get(i);
-				PTNode ptC = (PTNode) pt.Children.get(i);
+				PTNode thisC = this.Children.get(i);
+				PTNode ptC = pt.Children.get(i);
 				if ( !thisC.equals(ptC) )
 					return false;
 			}

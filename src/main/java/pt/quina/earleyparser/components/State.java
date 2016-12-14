@@ -1,4 +1,4 @@
-package earleyparser.components; /******************************************************************************
+package pt.quina.earleyparser.components; /******************************************************************************
  * author: Breanna Ammons
  * project: EarleyParser with parse trees
  * 
@@ -35,7 +35,7 @@ public class State
 		this.rhs = rhs;
 		this.i = i;
 		this.j = j;
-		this.srcs = new Vector<State>();
+		this.srcs = new Vector<>();
 		if ( src != null )
 			this.srcs.add(src);
 	}
@@ -111,11 +111,8 @@ public class State
 		
 		if ( i != s.i )
 			return false;
-		
-		if ( j != s.j )
-			return false;
 
-		return true;
+		return j == s.j;
 	}
 
 	/**************************************************************************
@@ -126,18 +123,12 @@ public class State
 	@Override
 	public String toString()
 	{
-		StringBuffer out = new StringBuffer();
-
-		out.append(lhs + "\t-> ");
-		out.append(rhs);
-		out.append("\t[" + i + ", " + j + "]");
-
-		return out.toString();
+		return (lhs + "\t-> ") +
+				rhs +
+				"\t[" + i + ", " + j + "]";
 	}
 
 	public String getCSV() {
-		StringBuffer out = new StringBuffer();
-		out.append(lhs).append( "-> ").append(rhs).append(";").append("[" + i + ", " + j + "]").append(";");
-		return out.toString();
+		return lhs + "-> " + rhs + ";" + "[" + i + ", " + j + "]" + ";";
 	}
 }

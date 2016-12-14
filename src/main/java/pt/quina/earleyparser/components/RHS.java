@@ -1,4 +1,4 @@
-package earleyparser.components;
+package pt.quina.earleyparser.components;
 
 /******************************************************************************
  * author: Breanna Ammons

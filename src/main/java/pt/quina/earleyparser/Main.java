@@ -1,4 +1,4 @@
-/******************************************************************************
+package pt.quina.earleyparser; /******************************************************************************
  * author: Breanna Ammons
  * project: EarleyParser with parse trees
  *
@@ -9,10 +9,10 @@
  *
  *****************************************************************************/
 
-import earleyparser.components.Chart;
-import earleyparser.components.ParseTree;
-import earleyparser.components.State;
-import earleyparser.grammars.MyGrammar;
+import pt.quina.earleyparser.components.Chart;
+import pt.quina.earleyparser.components.ParseTree;
+import pt.quina.earleyparser.components.State;
+import pt.quina.earleyparser.grammars.MyGrammar;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,7 +76,7 @@ public class Main {
         Vector<ParseTree> pt = ParseTree.getTree(parser.getGrammar(), charts);
         for (int i = 0; i < pt.size(); i++) {
             System.out.println("Parse Tree " + i + ":");
-            System.out.println((ParseTree) pt.get(i));
+            System.out.println(pt.get(i));
         }
 
         if (pt.size() == 0)

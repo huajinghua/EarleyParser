@@ -1,4 +1,4 @@
-package earleyparser.components; /******************************************************************************
+package pt.quina.earleyparser.components; /******************************************************************************
  * author: Breanna Ammons
  * project: EarleyParser with parse trees
  * 
@@ -41,7 +41,7 @@ public class Chart
 		if ( chart.contains(s) )
 		{
 			int i = chart.indexOf(s);
-			State orig = (State) chart.get(i);
+			State orig = chart.get(i);
 			orig.addSources(s);
 		}
 		else
@@ -59,7 +59,7 @@ public class Chart
 		if ( i < 0 || i >= chart.size() )
 			return null;
 
-		return (State) chart.get(i);
+		return chart.get(i);
 	}
 
 	/**************************************************************************
@@ -73,7 +73,7 @@ public class Chart
 		StringBuffer out = new StringBuffer();
 
 		for ( int i = 0; i < chart.size(); i++ )
-			out.append((State) chart.get(i) + "\n");
+			out.append(chart.get(i) + "\n");
 
 		return out.toString();
 	}
