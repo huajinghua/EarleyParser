@@ -9,42 +9,98 @@ package pt.quina.earleyparser; /************************************************
  *
  *****************************************************************************/
 
+import org.apache.commons.cli.*;
+import org.apache.commons.lang3.StringUtils;
 import pt.quina.earleyparser.components.Chart;
 import pt.quina.earleyparser.components.ParseTree;
 import pt.quina.earleyparser.components.State;
+import pt.quina.earleyparser.grammars.Grammar;
 import pt.quina.earleyparser.grammars.MyGrammar;
+import pt.quina.earleyparser.grammars.NewGrammar;
+import pt.quina.earleyparser.grammars.ParsedGrammar;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 public class Main {
+
+
     public static void main(String[] args) {
-        /*// John called Mary.
-        String[] sentence1 = { "John", "called", "Mary" };
+        //test(new String[]{"O","presidente", "condena", "luta", "partidária"}, new EarleyParser(new NewGrammar()));
 
-		// John called Mary from Dever.
-		String[] sentence2 = { "John", "called", "Mary", "from", "Denver" };
+        Grammar grammar = null;
+        File sentencesFile = null;
 
-		// John called the Police from Denver.
-		String[] sentence3 = { "John", "called", "the", "Police", "from", "Denver" };
+        CommandLineParser parser = new BasicParser();
+        Options options = buildOptions();
+        try {
+            CommandLine cmd = parser.parse(options, args);
 
-		// Old men and women like dogs.
-		String[] sentence4 = { "Old", "men", "and", "women", "like", "dogs" };
+            grammar = new ParsedGrammar(new File(cmd.getOptionValue("cfg")));
 
-		Grammar grammar = new NewGrammar();
-		EarleyParser parser = new EarleyParser(grammar);
+            sentencesFile = new File(cmd.getOptionValue("s"));
 
-		test(sentence1, parser);
-		test(sentence2, parser);
-		test(sentence3, parser);
-		test(sentence4, parser);
-		*/
-        //test(new String[]{"Comboio", "descarrila", "em", "Nova_Iorque"}, new EarleyParser(new MyGrammar()));
-        //test(new String[]{"Adjudicações", "na", "Madeira", "desrespeitam", "as", "regras"}, new EarleyParser(new MyGrammar()));
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp(getRunningFile(), options);
+            return;
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            return;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
 
-        test(new String[]{"Comboio", "descarrila"}, new EarleyParser(new MyGrammar()));
 
+        try (Stream<String> lines = Files.lines(sentencesFile.toPath(), StandardCharsets.UTF_8)) {
+            for (String line : (Iterable<String>) lines::iterator) {
+                if (StringUtils.isNotBlank(line)) {
+                    String[] strings = line.trim().split("\\s+");
+                    MyGrammar my = new MyGrammar();
+                    test(strings, new EarleyParser(grammar));
+                    test(strings, new EarleyParser(my));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    private static String getRunningFile() {
+        try {
+            return (new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())).getName();
+        } catch (URISyntaxException e) {
+            return "RUNNING-JAR";
+        }
+    }
+
+    private static Options buildOptions() {
+        Options options = new Options();
+
+        Option cfgOption = new Option("cfg", "grammar-file", true, "The Context Free Grammar file");
+        cfgOption.setRequired(true);
+        options.addOption(cfgOption);
+
+        Option sentenceOption = new Option("s", "sentences-file", true, "The file containing the sentences to be parsed using the grammar file");
+        sentenceOption.setRequired(false);
+        options.addOption(sentenceOption);
+
+        Option printTreeOption = new Option("t", "print-tree", true, "Prints the syntax tree for each sentence.");
+        sentenceOption.setRequired(false);
+        options.addOption(printTreeOption);
+
+        return options;
     }
 
 
@@ -57,11 +113,15 @@ public class Main {
             out.append(sent[i] + " ");
         out.append(sent[sent.length - 1] + ".");
 
+        String join = StringUtils.join(sent, " ");
+
         String sentence = out.toString();
 
         System.out.println("\nSentence: \"" + sentence + "\"");
         boolean successful = parser.parseSentence(sent);
         System.out.println("Parse Successful:" + successful);
+
+        if (!successful) return;
 
         Chart[] charts = parser.getCharts();
         System.out.println("");
@@ -104,7 +164,7 @@ public class Main {
                 if ("".equals(backPointers))
                     backPointers += map.get(stateSource);
                 else
-                    backPointers += ", "+map.get(stateSource) ;
+                    backPointers += ", " + map.get(stateSource);
             }
         }
         return backPointers;
@@ -121,4 +181,5 @@ public class Main {
         }
         return stateMap;
     }
+
 }

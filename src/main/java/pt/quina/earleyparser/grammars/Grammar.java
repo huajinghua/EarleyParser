@@ -13,27 +13,29 @@ import pt.quina.earleyparser.components.RHS;
 import java.util.HashMap;
 import java.util.Vector;
 
-public class Grammar {
+public abstract class Grammar {
     // A mapping between a LHS (the String) and an array of RHS's.
-    HashMap<String, RHS[]> Rules;
+    HashMap<String, RHS[]> rules;
 
     // An array of LHS's that are Parts of Speech.
-    Vector<String> POS;
+    Vector<String> partsOfSpeech;
 
     public Grammar() {
-        Rules = new HashMap<String, RHS[]>();
-        POS = new Vector<String>();
+        rules = new HashMap<String, RHS[]>();
+        partsOfSpeech = new Vector<String>();
     }
 
     public RHS[] getRHS(String lhs) {
         RHS[] rhs = null;
-        if (Rules.containsKey(lhs))
-            rhs = Rules.get(lhs);
+        if (rules.containsKey(lhs))
+            rhs = rules.get(lhs);
 
         return rhs;
     }
 
     public boolean isPartOfSpeech(String s) {
-        return POS.contains(s);
+        return partsOfSpeech.contains(s);
     }
+
+    public abstract String buildRulesTree();
 }
