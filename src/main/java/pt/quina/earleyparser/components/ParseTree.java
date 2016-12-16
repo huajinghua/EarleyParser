@@ -1,19 +1,4 @@
-package pt.quina.earleyparser.components; /******************************************************************************
- * author: Breanna Ammons
- * project: EarleyParser with parse trees
- * 
- * ParseTree
- *   The ParseTree is a particualr parse of a sentence. There is a static 
- *   function that will take a grammar and a chart set produced from the 
- *   grammar and will return a vector of ParseTrees. This vector will be empty
- *   if there were not any possible parses, and will contain potentially more 
- *   than one if the sentence is ambiguous.
- * 
- *   As it stands, the ParseTree class only has two public functins. One is the 
- *   static getTree() that will create a vector of ParseTrees. The other is 
- *   toString() so that you can print the trees.
- * 
- *****************************************************************************/
+package pt.quina.earleyparser.components;
 
 import pt.quina.earleyparser.grammars.Grammar;
 
@@ -21,6 +6,22 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Vector;
 
+/******************************************************************************
+ * author: Breanna Ammons
+ * project: EarleyParser with parse trees
+ *
+ * ParseTree
+ *   The ParseTree is a particualr parse of a sentence. There is a static
+ *   function that will take a grammar and a chart set produced from the
+ *   grammar and will return a vector of ParseTrees. This vector will be empty
+ *   if there were not any possible parses, and will contain potentially more
+ *   than one if the sentence is ambiguous.
+ *
+ *   As it stands, the ParseTree class only has two public functins. One is the
+ *   static getTree() that will create a vector of ParseTrees. The other is
+ *   toString() so that you can print the trees.
+ *
+ *****************************************************************************/
 public class ParseTree
 {
 	private PTNode root;
@@ -30,7 +31,6 @@ public class ParseTree
 	private Deque<State> stateList;
 
 	static private int ID = 0;
-	static private Chart[] charts;
 	static private Grammar grammar;
 
 	final static private String tab = "\t";
@@ -42,26 +42,20 @@ public class ParseTree
 	private ParseTree()
 	{
 		root = null;
-		stateList = new ArrayDeque<State>();
+		stateList = new ArrayDeque<>();
 	}
 
-	private ParseTree(String s)
+    private ParseTree(String s, State st)
 	{
 		root = new PTNode(s, null);
-		stateList = new ArrayDeque<State>();
-	}
-
-	private ParseTree(String s, State st)
-	{
-		root = new PTNode(s, null);
-		stateList = new ArrayDeque<State>();
+		stateList = new ArrayDeque<>();
 		stateList.addFirst(st);
 	}
 
 	private ParseTree(PTNode r)
 	{
 		root = r;
-		stateList = new ArrayDeque<State>();
+		stateList = new ArrayDeque<>();
 	}
 
 	private ParseTree getParent()
@@ -71,9 +65,9 @@ public class ParseTree
 		return new ParseTree(root.Parent);
 	}
 
-	private ParseTree getChild(int i)
+	private ParseTree getChild()
 	{
-		return new ParseTree(root.getChild(i));
+		return new ParseTree(root.getChild());
 	}
 
 	/**************************************************************************
@@ -176,7 +170,7 @@ public class ParseTree
 	 *************************************************************************/
 	static private Vector<ParseTree> parseTree(ParseTree tree, ParseTree child, State currentState)
 	{
-		Vector<ParseTree> trees = new Vector<ParseTree>();
+		Vector<ParseTree> trees = new Vector<>();
 
 		String[] startTerms = { "@", "S" };
 		RHS startRHS = new RHS(startTerms);
@@ -224,7 +218,7 @@ public class ParseTree
 			//  parsed yet and this one will be complete.
 			tree.stateList.removeFirst();
 			String[] terms = currentState.getRHS().getTerms();
-			child.getChild(0).addChild(terms[0]);
+			child.getChild().addChild(terms[0]);
 
 			// Select the correct source (the one with the correct i)
 			if ( srcs.size() == 1 )
@@ -233,19 +227,18 @@ public class ParseTree
 			{
 				State posState = tree.stateList.peekFirst();
 
-				for ( int i = 0; i < srcs.size(); i++ )
-				{
-					// If the state we are currently looking at, matches the 
-					//  the top state in the stateList (with the dot moved 
-					//  one term) then it is the correct source.
-					currentState = srcs.get(i);
-					State moveCurrent = new State(currentState.getLHS(), 
-												  currentState.getRHS().moveDot(), 
-												  currentState.getI(), 
-												  currentState.getJ() + 1, null);
-					if ( moveCurrent.equals(posState) )
-						break;
-				}
+                for (State src : srcs) {
+                    // If the state we are currently looking at, matches the
+                    //  the top state in the stateList (with the dot moved
+                    //  one term) then it is the correct source.
+                    currentState = src;
+                    State moveCurrent = new State(currentState.getLHS(),
+                            currentState.getRHS().moveDot(),
+                            currentState.getI(),
+                            currentState.getJ() + 1, null);
+                    if (moveCurrent.equals(posState))
+                        break;
+                }
 			}
 			
 			srcs = currentState.getSources();
@@ -268,40 +261,37 @@ public class ParseTree
 
 		// For every source of the updated currentState, we may need to attempt a
 		//  backwards parse.
-		for ( int i = 0; i < srcs.size(); i++ )
-		{
-			ParseTree treeCopy = tree.copy();
-			ParseTree childCopy = treeCopy.getNodeI(child.getRootID());
-			ParseTree nextChild;
+        for (State src : srcs) {
+            ParseTree treeCopy = tree.copy();
+            ParseTree childCopy = treeCopy.getNodeI(child.getRootID());
+            ParseTree nextChild;
 
-			if ( rhs.isDotFirst() )
-				nextChild = childCopy.getParent();
-			else if ( addedLHS )
-				nextChild = childCopy.getChild(0);
-			else
-				nextChild = childCopy;
-			
-			State nextState = srcs.get(i);
-			String lhs = nextState.getLHS();
+            if (rhs.isDotFirst())
+                nextChild = childCopy.getParent();
+            else if (addedLHS)
+                nextChild = childCopy.getChild();
+            else
+                nextChild = childCopy;
 
-			// When the sources list for a state was created during parsing, all of the 
-			//  potential trees were mixed together. This means that some of the 
-			//  sources are not valid for the particular parse tree we are creating.
-			// The conditions were it could be a source are:
-			//    1) The LHS of the potential source is the same as the term prior
-			//       to the dot. This source was produced by the predictor step.
-			//    2) We have just completed parsing the term prior to the dot. This source
-			//       was produced by the completer step. 
-			//
-			// The scanner step does not need to be handled here due to being handled
-			//  when we were handling the POS.
-			if ( currentState.getRHS().getPriorToDot().compareTo(lhs) == 0 || 
-				 ( tree.stateList.peek().getRHS().equals(nextState.getRHS().moveDot()) &&
-				   tree.stateList.peek().getLHS().compareTo(nextState.getLHS()) == 0 ) )
-			{
-				trees.addAll(parseTree(treeCopy, nextChild, nextState));
-			}
-		}
+            String lhs = src.getLHS();
+
+            // When the sources list for a state was created during parsing, all of the
+            //  potential trees were mixed together. This means that some of the
+            //  sources are not valid for the particular parse tree we are creating.
+            // The conditions were it could be a source are:
+            //    1) The LHS of the potential source is the same as the term prior
+            //       to the dot. This source was produced by the predictor step.
+            //    2) We have just completed parsing the term prior to the dot. This source
+            //       was produced by the completer step.
+            //
+            // The scanner step does not need to be handled here due to being handled
+            //  when we were handling the POS.
+            if (currentState.getRHS().getPriorToDot().compareTo(lhs) == 0 ||
+                    (tree.stateList.peek().getRHS().equals(src.getRHS().moveDot()) &&
+                            tree.stateList.peek().getLHS().compareTo(src.getLHS()) == 0)) {
+                trees.addAll(parseTree(treeCopy, nextChild, src));
+            }
+        }
 
 		return trees;
 	}
@@ -316,37 +306,32 @@ public class ParseTree
 	**************************************************************************/
 	static public Vector<ParseTree> getTree(Grammar g, Chart[] c)
 	{
-		charts = c;
-		grammar = g;
-		Chart lastC = charts[charts.length - 1];
+        grammar = g;
+		Chart lastC = c[c.length - 1];
 		State parse = lastC.getState(lastC.size() - 1);
-		Vector<ParseTree> trees = new Vector<ParseTree>();
+		Vector<ParseTree> trees = new Vector<>();
 
 		String[] fin = { "S", "@" };
 		RHS finRHS = new RHS(fin);
-		State finish = new State("$", finRHS, 0, charts.length - 1, null);
+		State finish = new State("$", finRHS, 0, c.length - 1, null);
 
 		// If there was a successful parse, find all of the possible parse trees.
 		if ( parse.equals(finish) )
 		{ 
 			Vector<State> srcs = parse.getSources();
-			for ( int i = 0; i < srcs.size(); i++ )
-			{
-				// Find all the trees that could come from this source.
-				State s = srcs.get(i);
-				ParseTree pt = new ParseTree(parse.getLHS(), parse);
-				trees.addAll(parseTree(pt, pt, s));
-			}
+            for (State s : srcs) {
+                // Find all the trees that could come from this source.
+                ParseTree pt = new ParseTree(parse.getLHS(), parse);
+                trees.addAll(parseTree(pt, pt, s));
+            }
 		}
 
 		// Remove any duplicate trees.
-		Vector<ParseTree> noDups = new Vector<ParseTree>();
-		for ( int i = 0; i < trees.size(); i++ )
-		{
-			ParseTree pt = trees.get(i);
-			if ( ! noDups.contains(pt) )
-				noDups.add(pt);
-		}
+		Vector<ParseTree> noDups = new Vector<>();
+        for (ParseTree pt : trees) {
+            if (!noDups.contains(pt))
+                noDups.add(pt);
+        }
 
 		return noDups;
 	}
@@ -364,10 +349,7 @@ public class ParseTree
 		if ( root == null )
 			return "";
 
-		StringBuffer out = new StringBuffer();
-		out.append(root.prettyPrint(""));
-
-		return out.toString();
+        return root.prettyPrint("");
 	}
 
 	/**************************************************************************
@@ -383,30 +365,30 @@ public class ParseTree
 		String Value;
 		int id;
 
-		public PTNode(String v, PTNode p)
+		PTNode(String v, PTNode p)
 		{
-			Children = new Vector<PTNode>();
+			Children = new Vector<>();
 			Parent = p;
 			Value = v;
 			id = ID++;
 		}
 
-		public PTNode(String v, PTNode p, int i)
+		PTNode(String v, PTNode p, int i)
 		{
-			Children = new Vector<PTNode>();
+			Children = new Vector<>();
 			Parent = p;
 			Value = v;
 			id = i;
 		}
 
-		public void addChild(PTNode c)
+		void addChild(PTNode c)
 		{
 			Children.add(0, c);
 		}
 
-		public PTNode getChild(int i)
+		PTNode getChild()
 		{
-			return Children.get(i);
+			return Children.get(0);
 		}
 
 		/**********************************************************************
@@ -414,7 +396,7 @@ public class ParseTree
 		 *   This will make a new PTNode with the same value and a copy of 
 		 *   all of the children.
 		**********************************************************************/
-		public PTNode copy()
+        PTNode copy()
 		{
 			PTNode n = new PTNode(Value, null, id);
 			for ( int i = Children.size() - 1; i >= 0; i-- )
@@ -442,16 +424,14 @@ public class ParseTree
 		 *          8
 		 *        7
 		**********************************************************************/
-		public String prettyPrint(String offset)
+        String prettyPrint(String offset)
 		{
-			StringBuffer out = new StringBuffer();
-			out.append(offset + Value + "\n");
+			StringBuilder out = new StringBuilder();
+			out.append(offset).append(Value).append("\n");
 
-			for ( int i = 0; i < Children.size(); i++ )
-			{
-				PTNode c = Children.get(i);
-				out.append(c.prettyPrint(offset + tab));
-			}
+            for (PTNode c : Children) {
+                out.append(c.prettyPrint(offset + tab));
+            }
 
 			return out.toString();
 		}
@@ -470,11 +450,11 @@ public class ParseTree
 			if ( Children.size() == 0 )
 				return Value;
 			
-			StringBuffer out = new StringBuffer();			
-			out.append(Value + "<");
+			StringBuilder out = new StringBuilder();
+			out.append(Value).append("<");
 
 			for ( int i = 0; i < Children.size() - 1; i++ )
-				out.append(Children.get(i) + ",");
+				out.append(Children.get(i)).append(",");
 
 			if ( Children.size() > 0 )
 				out.append(Children.get(Children.size() - 1));
@@ -488,7 +468,7 @@ public class ParseTree
 		 *   This is an over-ride of the equals function. It tests that 
 		 *   equivalence of the value at the node and the values of all the 
 		 *   children nodes recursively. Two nodes are only equal if they and 
-		 *   ALL of their childen are equal.
+		 *   ALL of their children are equal.
 		 *********************************************************************/
 		@Override
 		public boolean equals(Object obj)

@@ -1,13 +1,5 @@
-package pt.quina.earleyparser; /******************************************************************************
- * author: Breanna Ammons
- * project: EarleyParser with parse trees
- *
- * Main
- *   This the main program. It creates and runs the parser on 4 example 
- *   sentences. The test function displays all of the charts produced during 
- *   the parsing and will print any parse tree that was produced.
- *
- *****************************************************************************/
+package pt.quina.earleyparser;
+
 
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +8,6 @@ import pt.quina.earleyparser.components.ParseTree;
 import pt.quina.earleyparser.components.State;
 import pt.quina.earleyparser.grammars.Grammar;
 import pt.quina.earleyparser.grammars.MyGrammar;
-import pt.quina.earleyparser.grammars.NewGrammar;
 import pt.quina.earleyparser.grammars.ParsedGrammar;
 
 import java.io.File;
@@ -30,14 +21,26 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.stream.Stream;
 
+
+
+/******************************************************************************
+ * author: Breanna Ammons
+ * project: EarleyParser with parse trees
+ *
+ * Main
+ *   This the main program. It creates and runs the parser on 4 example
+ *   sentences. The test function displays all of the charts produced during
+ *   the parsing and will print any parse tree that was produced.
+ *
+ *****************************************************************************/
 public class Main {
 
 
     public static void main(String[] args) {
         //test(new String[]{"O","presidente", "condena", "luta", "partidária"}, new EarleyParser(new NewGrammar()));
 
-        Grammar grammar = null;
-        File sentencesFile = null;
+        Grammar grammar;
+        File sentencesFile;
 
         CommandLineParser parser = new BasicParser();
         Options options = buildOptions();
@@ -107,15 +110,10 @@ public class Main {
     // Test uses the parser on the sentence passed in. It will then
     //  print out the charts that were produced during the parsing, as
     //  well as all parse trees.
-    static void test(String[] sent, EarleyParser parser) {
-        StringBuffer out = new StringBuffer();
-        for (int i = 0; i < sent.length - 1; i++)
-            out.append(sent[i] + " ");
-        out.append(sent[sent.length - 1] + ".");
+    private static void test(String[] sent, EarleyParser parser) {
 
-        String join = StringUtils.join(sent, " ");
 
-        String sentence = out.toString();
+        String sentence = StringUtils.join(sent, " ").concat(".");
 
         System.out.println("\nSentence: \"" + sentence + "\"");
         boolean successful = parser.parseSentence(sent);
@@ -173,9 +171,9 @@ public class Main {
     private static Map<State, String> getStatesMap(Chart[] charts) {
         Map<State, String> stateMap = new HashMap<>();
         int counter = 0;
-        for (int i = 0; i < charts.length; i++) {
-            for (int j = 0; j < charts[i].size(); j++) {
-                State state = charts[i].getState(j);
+        for (Chart chart : charts) {
+            for (int j = 0; j < chart.size(); j++) {
+                State state = chart.getState(j);
                 stateMap.put(state, "S" + counter++);
             }
         }

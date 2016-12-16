@@ -1,19 +1,20 @@
-package pt.quina.earleyparser.components; /******************************************************************************
- * author: Breanna Ammons
- * project: EarleyParser with parse trees
- * 
- * State
- *   The state is a LHS, a RHS, i and j that describe the section of the 
- *   sentence we are considering, and the sources of this state. The state is
- *   mostly a container class for all of the individual parts. It can compare 
- *   itself to other states and will print nicely.
- * 
- *   If additional information needed to be associated with the state, this 
- *   would potentially be the place to add it.
- * 
- *****************************************************************************/
+package pt.quina.earleyparser.components;
 
 import java.util.Vector;
+/******************************************************************************
+ * author: Breanna Ammons
+ * project: EarleyParser with parse trees
+ *
+ * State
+ *   The state is a LHS, a RHS, i and j that describe the section of the
+ *   sentence we are considering, and the sources of this state. The state is
+ *   mostly a container class for all of the individual parts. It can compare
+ *   itself to other states and will print nicely.
+ *
+ *   If additional information needed to be associated with the state, this
+ *   would potentially be the place to add it.
+ *
+ *****************************************************************************/
 
 public class State
 {
@@ -65,11 +66,6 @@ public class State
 		return srcs;
 	}
 
-	public String getPriorToDot()
-	{
-		return rhs.getPriorToDot();
-	}
-
 	public String getAfterDot()
 	{
 		return rhs.getAfterDot();
@@ -80,45 +76,36 @@ public class State
 		return rhs.isDotLast();
 	}
 
-	public void addSources(State s)
+	void addSources(State s)
 	{
 		srcs.addAll(s.srcs);
 	}
 
-	@Override
 	/**************************************************************************
 	 * equals()
-	 *   This is an over-ride of the equals function. It tests that the LHS, 
-	 *   RHS, the i, and the j are equivalent. We do not test that the sources 
-	 *   are the same. During the forward and the backward parsing we do not 
+	 *   This is an over-ride of the equals function. It tests that the LHS,
+	 *   RHS, the i, and the j are equivalent. We do not test that the sources
+	 *   are the same. During the forward and the backward parsing we do not
 	 *   care if the sources are different.
 	 *************************************************************************/
-	public boolean equals(Object o)
-	{
-		if ( o == null )
+	@Override
+	public boolean equals(Object o) {
+		if (o == null)
 			return false;
-		
-		if ( o.getClass() != this.getClass() )
+
+		if (o.getClass() != this.getClass())
 			return false;
-		
+
 		State s = (State) o;
 
-		if ( lhs.compareTo(s.lhs) != 0 )
-			return false;
-		
-		if ( ! rhs.equals(s.rhs) )
-			return false;
-		
-		if ( i != s.i )
-			return false;
+		return lhs.compareTo(s.lhs) == 0 && rhs.equals(s.rhs) && i == s.i && j == s.j;
 
-		return j == s.j;
 	}
 
 	/**************************************************************************
 	 * toString()
 	 *   This is an over-ride of the toString function. It prints the state in
-	 *   a way to make it more readable and useable during debugging.
+	 *   a way to make it more readable and usable during debugging.
 	 *************************************************************************/
 	@Override
 	public String toString()

@@ -42,11 +42,6 @@ public class NewGrammar extends Grammar
 		initialize();
 	}
 
-	@Override
-	public String buildRulesTree() {
-		return null;
-	}
-
 	private void initialize()
 	{
 		initRules();
@@ -128,7 +123,7 @@ public class NewGrammar extends Grammar
 		String article = "Art";
 		String[] article1 = { "O" };
 		String[] article2 = { "a" };
-		RHS[] articleRHS = { new RHS(article1) };
+		RHS[] articleRHS = { new RHS(article1),new RHS(article2) };
 		rules.put(article, articleRHS);
 	}
 

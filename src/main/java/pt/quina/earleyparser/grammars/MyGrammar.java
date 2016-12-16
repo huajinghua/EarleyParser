@@ -8,11 +8,6 @@ public class MyGrammar extends Grammar {
         initialize();
     }
 
-    @Override
-    public String buildRulesTree() {
-        return null;
-    }
-
     private void initialize() {
         initRules();
         initPOS();

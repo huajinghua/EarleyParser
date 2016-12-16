@@ -41,42 +41,31 @@ public class RHS
 		return terms;
 	}
 
-	public String getPriorToDot()
+	String getPriorToDot()
 	{
 		if ( hasDot && dot > 0 )
 			return terms[dot - 1];
 		return "";
 	}
 
-	public String getAfterDot()
+	String getAfterDot()
 	{
 		if ( hasDot && dot < terms.length - 1 )
 			return terms[dot + 1];
 		return "";
 	}
 
-	public int getDotPos()
+	int getDotPos()
 	{
 		return dot;
 	}
 
-	public boolean hasDot()
-	{
-		return hasDot;
+	boolean isDotLast() {
+		return hasDot && (dot == terms.length - 1);
 	}
 
-	public boolean isDotLast()
-	{
-		if ( hasDot )
-			return (dot == terms.length - 1);
-		return false;
-	}
-
-	public boolean isDotFirst()
-	{
-		if ( hasDot )
-			return (dot == 0);
-		return false;
+	boolean isDotFirst() {
+		return hasDot && (dot == 0);
 	}
 
 	/**************************************************************************
@@ -89,8 +78,7 @@ public class RHS
 		String[] t = new String[terms.length + 1];
 		t[0] = DOT;
 
-		for ( int i = 1; i < t.length; i++ )
-			t[i] = terms[i - 1];
+		System.arraycopy(terms, 0, t, 1, t.length - 1);
 
 		return new RHS(t);
 	}
@@ -103,9 +91,8 @@ public class RHS
 	public RHS addDotLast()
 	{
 		String[] t = new String[terms.length + 1];
-		
-		for ( int i = 0; i < t.length - 1; i++ )
-			t[i] = terms[i];
+
+		System.arraycopy(terms, 0, t, 0, t.length - 1);
 		
 		t[t.length - 1] = DOT;
 		
@@ -179,10 +166,10 @@ public class RHS
 	@Override
 	public String toString()
 	{
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 
 		for ( int i = 0; i < terms.length - 1; i++ )
-			out.append(terms[i] + " ");
+			out.append(terms[i]).append(" ");
 
 		out.append(terms[terms.length - 1]);
 

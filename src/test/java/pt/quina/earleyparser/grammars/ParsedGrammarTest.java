@@ -1,17 +1,14 @@
 package pt.quina.earleyparser.grammars;
 
 import org.junit.Assert;
-import org.junit.Test;
 import pt.quina.earleyparser.components.RHS;
 
 import java.io.File;
 import java.net.URL;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-/**
- * Created by NB22771 on 14/12/2016.
- */
 public class ParsedGrammarTest {
 
     private Grammar grammar;
@@ -64,10 +61,4 @@ public class ParsedGrammarTest {
         assertTrue(grammar.isPartOfSpeech("Prep"));
         assertTrue(grammar.isPartOfSpeech("Art"));
     }
-
-    @Test
-    public void buildRulesTree() throws Exception {
-        grammar.buildRulesTree();
-    }
-
 }

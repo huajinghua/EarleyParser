@@ -9,6 +9,7 @@ import java.io.IOException;
 import static org.junit.Assert.*;
 
 /**
+ * Earley Parser class test
  * Created by NB22771 on 14/12/2016.
  */
 public class EarleyParserTest {

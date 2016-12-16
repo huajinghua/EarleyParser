@@ -24,11 +24,11 @@ public class EarleyParser {
         grammar = g;
     }
 
-    public Grammar getGrammar() {
+    Grammar getGrammar() {
         return grammar;
     }
 
-    public Chart[] getCharts() {
+    Chart[] getCharts() {
         return charts;
     }
 
@@ -37,7 +37,7 @@ public class EarleyParser {
      *   This is the main loop for parsing the sentence into the chart. It will
      *   return true if there is at least one successful parse of the sentence.
      *************************************************************************/
-    public boolean parseSentence(String[] s) {
+    boolean parseSentence(String[] s) {
         sentence = s;
         charts = new Chart[sentence.length + 1];
         for (int i = 0; i < charts.length; i++)
@@ -49,9 +49,9 @@ public class EarleyParser {
         State start = new State("$", startRHS, 0, 0, null);
         charts[0].addState(start);
 
-        for (int i = 0; i < charts.length; i++) {
-            for (int j = 0; j < charts[i].size(); j++) {
-                State st = charts[i].getState(j);
+        for (Chart chart : charts) {
+            for (int j = 0; j < chart.size(); j++) {
+                State st = chart.getState(j);
                 String next_term = st.getAfterDot();
 
                 if (st.isDotLast())
@@ -83,8 +83,8 @@ public class EarleyParser {
         RHS[] rhs = grammar.getRHS(lhs);
         int j = s.getJ();
 
-        for (int i = 0; i < rhs.length; i++) {
-            State ns = new State(lhs, rhs[i].addDot(), j, j, s);
+        for (RHS rh : rhs) {
+            State ns = new State(lhs, rh.addDot(), j, j, s);
             charts[j].addState(ns);
         }
     }
@@ -100,12 +100,10 @@ public class EarleyParser {
 
         int j = s.getJ();
 
-        for (int a = 0; a < rhs.length; a++) {
-            String[] terms = rhs[a].getTerms();
-            if (terms.length == 1 &&
-                    j < sentence.length &&
-                    terms[0].compareToIgnoreCase(sentence[j]) == 0) {
-                State ns = new State(lhs, rhs[a].addDotLast(), j, j + 1, s);
+        for (RHS rh : rhs) {
+            String[] terms = rh.getTerms();
+            if (terms.length == 1 && j < sentence.length && terms[0].compareToIgnoreCase(sentence[j]) == 0) {
+                State ns = new State(lhs, rh.addDotLast(), j, j + 1, s);
                 charts[j + 1].addState(ns);
             }
         }

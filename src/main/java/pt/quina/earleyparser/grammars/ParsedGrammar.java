@@ -1,7 +1,6 @@
 package pt.quina.earleyparser.grammars;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import pt.quina.earleyparser.components.RHS;
 
 import java.io.File;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Created by NB22771 on 13/12/2016.
+ * Grammar created by reading the contents of a file.
  */
 public class ParsedGrammar extends Grammar {
     private File grammarFile;
@@ -60,20 +59,5 @@ public class ParsedGrammar extends Grammar {
         }
     }
 
-    @Override
-    public String buildRulesTree() {
-        String root=null;
-        for (String key : rules.keySet()) {
-            RHS[] rhSides = rules.get(key);
-            for (RHS rhSide : rhSides) {
-                if (rules.containsKey(rhSide)) {
-                } else {
-                    root=key;
-                    break;
-                }
-            }
-        }
-        System.out.println(root);
-        return "";
-    }
+
 }
